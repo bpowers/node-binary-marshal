@@ -1,10 +1,9 @@
 {
-  "name": "json-marshal",
+  "name": "node-binary-marshal",
   "version": "0.1.0",
-  "description": "Roundtrip JSON objects to Uint8Arrays",
+  "description": "Roundtrip JSON objects to C structs in Uint8Arrays",
   "main": "index.js",
-  "scripts": {
-  },
+  "scripts": {},
   "author": "Bobby Powers <bobbypowers@gmail.com>",
   "license": "ISC",
   "devDependencies": {
@@ -15,6 +14,7 @@
     "gulp-typescript": "^2.9.2",
     "merge2": "^0.3.6",
     "mocha": "^2.3.4",
+    "tsd": "^0.6.5",
     "typescript": "^1.6.2"
   }
 }
