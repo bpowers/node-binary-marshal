@@ -81,15 +81,16 @@ const WRITE_FNS: {[n: string]: MarshalFn} = {
 		buf[off+3] = (field) >>> 24;
 	},
 	uint64: function(buf: Uint8Array, off: number, field: number): any {
-		field = field|0;
-		buf[off+0] = (field) >>> 0;
-		buf[off+1] = (field) >>> 8;
-		buf[off+2] = (field) >>> 16;
-		buf[off+3] = (field) >>> 24;
-		buf[off+4] = (field) >>> 32;
-		buf[off+5] = (field) >>> 40;
-		buf[off+6] = (field) >>> 48;
-		buf[off+7] = (field) >>> 56;
+		let lo = field >>> 0;
+		let hi = (field - (-1 >>> 0)) >>> 0;
+		buf[off+0] = (lo) >>> 0;
+		buf[off+1] = (lo) >>> 8;
+		buf[off+2] = (lo) >>> 16;
+		buf[off+3] = (lo) >>> 24;
+		buf[off+4] = (hi) >>> 0;
+		buf[off+5] = (hi) >>> 8;
+		buf[off+6] = (hi) >>> 16;
+		buf[off+7] = (hi) >>> 24;
 	},
 	int8: function(buf: Uint8Array, off: number, field: number): any {
 		field = field|0;
@@ -108,15 +109,16 @@ const WRITE_FNS: {[n: string]: MarshalFn} = {
 		buf[off+3] = (field) >> 24;
 	},
 	int64: function(buf: Uint8Array, off: number, field: number): any {
-		field = field|0;
-		buf[off+0] = (field) >> 0;
-		buf[off+1] = (field) >> 8;
-		buf[off+2] = (field) >> 16;
-		buf[off+3] = (field) >> 24;
-		buf[off+4] = (field) >> 32;
-		buf[off+5] = (field) >> 40;
-		buf[off+6] = (field) >> 48;
-		buf[off+7] = (field) >> 56;
+		let lo = field|0;
+		let hi = (field - (-1 >>> 0))|0;
+		buf[off+0] = (lo) >> 0;
+		buf[off+1] = (lo) >> 8;
+		buf[off+2] = (lo) >> 16;
+		buf[off+3] = (lo) >> 24;
+		buf[off+4] = (hi) >> 0;
+		buf[off+5] = (hi) >> 8;
+		buf[off+6] = (hi) >> 16;
+		buf[off+7] = (hi) >> 24;
 	},
 };
 
