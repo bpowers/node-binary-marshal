@@ -28,7 +28,7 @@ export interface Timeval {
 
 export const TimevalDef = TimespecDef;
 
-let nullMarshal = (dst: Uint8Array, off: number, src: any): any => {};
+let nullMarshal = (dst: DataView, off: number, src: any): any => {};
 
 export interface Stat {
 	family: number;

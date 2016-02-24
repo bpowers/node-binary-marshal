@@ -33,12 +33,13 @@ describe('ipv4 roundtrip', () => {
 	IPv4_RT_TESTS.forEach((t: RoundtripData) => {
 		it('should roundtrip ' + t.addr, () => {
 			let buf = new Uint8Array(4);
-			let err = socket.IPv4StrToBytes(buf, 0, t.addr);
+			let view = new DataView(buf.buffer, buf.byteOffset);
+			let err = socket.IPv4StrToBytes(view, 0, t.addr);
 			expect(err).to.not.be.ok;
 			if (t.binary) {
 				// TODO: test
 			}
-			let out = socket.IPv4BytesToStr(buf, 0);
+			let out = socket.IPv4BytesToStr(view, 0);
 			expect(out).to.equal(t.addr);
 		});
 	});
@@ -48,7 +49,8 @@ describe('ipv4 error', () => {
 	IPv4_ERR_TESTS.forEach((t: RoundtripData) => {
 		it('should error ' + t.addr, () => {
 			let buf = new Uint8Array(4);
-			let err = socket.IPv4StrToBytes(buf, 0, t.addr);
+			let view = new DataView(buf.buffer, buf.byteOffset);
+			let err = socket.IPv4StrToBytes(view, 0, t.addr);
 			expect(err).to.be.ok;
 		});
 	});

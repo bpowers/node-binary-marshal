@@ -1,5 +1,5 @@
-export declare function IPv4BytesToStr(src: Uint8Array, off: number): any;
-export declare function IPv4StrToBytes(dst: Uint8Array, off: number, src: string): any;
+export declare function IPv4BytesToStr(src: DataView, off: number): any;
+export declare function IPv4StrToBytes(dst: DataView, off: number, src: string): any;
 export interface SockAddrIn {
     family: number;
     port: number;
@@ -14,8 +14,8 @@ export declare const SockAddrInDef: {
         type: string;
         count: number;
         JSONType: string;
-        marshal: (dst: Uint8Array, off: number, src: string) => any;
-        unmarshal: (src: Uint8Array, off: number) => any;
+        marshal: (dst: DataView, off: number, src: string) => any;
+        unmarshal: (src: DataView, off: number) => any;
     } | {
         name: string;
         type: string;

@@ -13,10 +13,10 @@ export interface FieldDef {
     omit?: boolean;
 }
 export interface MarshalFn {
-    (dst: Uint8Array, off: number, src: any): any;
+    (dst: DataView, off: number, src: any): any;
 }
 export interface UnmarshalFn {
-    (src: Uint8Array, off: number): any;
+    (src: DataView, off: number): any;
 }
 export interface EnsureFn {
     (field: Uint8Array): boolean;

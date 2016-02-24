@@ -22,11 +22,11 @@ export interface FieldDef {
 }
 
 export interface MarshalFn {
-	(dst: Uint8Array, off: number, src: any): any;
+	(dst: DataView, off: number, src: any): any;
 }
 
 export interface UnmarshalFn {
-	(src: Uint8Array, off: number): any;
+	(src: DataView, off: number): any;
 }
 
 export interface EnsureFn {
@@ -64,67 +64,53 @@ function fieldLen(field: FieldDef): number {
 }
 
 const WRITE_FNS: {[n: string]: MarshalFn} = {
-	uint8: function(buf: Uint8Array, off: number, field: number): any {
-		field = field|0;
-		buf[off] = field;
+	uint8: function(buf: DataView, off: number, field: number): any {
+		field = field >>> 0;
+		buf.setUint8(off, field);
 	},
-	uint16: function(buf: Uint8Array, off: number, field: number): any {
-		field = field|0;
-		buf[off+0] = (field) >>> 0;
-		buf[off+1] = (field) >>> 8;
+	uint16: function(buf: DataView, off: number, field: number): any {
+		field = field >>> 0;
+		buf.setUint16(off, field, true);
 	},
-	uint32: function(buf: Uint8Array, off: number, field: number): any {
-		field = field|0;
-		buf[off+0] = (field) >>> 0;
-		buf[off+1] = (field) >>> 8;
-		buf[off+2] = (field) >>> 16;
-		buf[off+3] = (field) >>> 24;
+	uint32: function(buf: DataView, off: number, field: number): any {
+		field = field >>> 0;
+		buf.setUint32(off, field, true);
 	},
-	uint64: function(buf: Uint8Array, off: number, field: number): any {
+	uint64: function(buf: DataView, off: number, field: number): any {
 		let lo = field >>> 0;
-		let hi = (field - (-1 >>> 0)) >>> 0;
-		buf[off+0] = (lo) >>> 0;
-		buf[off+1] = (lo) >>> 8;
-		buf[off+2] = (lo) >>> 16;
-		buf[off+3] = (lo) >>> 24;
-		buf[off+4] = (hi) >>> 0;
-		buf[off+5] = (hi) >>> 8;
-		buf[off+6] = (hi) >>> 16;
-		buf[off+7] = (hi) >>> 24;
+		let hi = 0;
+		if (field > lo)
+			hi = (field - (-1 >>> 0)) >>> 0;
+		buf.setUint32(off, lo, true);
+		buf.setUint32(off+4, hi, true);
 	},
-	int8: function(buf: Uint8Array, off: number, field: number): any {
+	int8: function(buf: DataView, off: number, field: number): any {
 		field = field|0;
-		buf[off] = field;
+		buf.setInt8(off, field);
 	},
-	int16: function(buf: Uint8Array, off: number, field: number): any {
+	int16: function(buf: DataView, off: number, field: number): any {
 		field = field|0;
-		buf[off+0] = (field) >> 0;
-		buf[off+1] = (field) >> 8;
+		buf.setInt16(off, field, true);
 	},
-	int32: function(buf: Uint8Array, off: number, field: number): any {
+	int32: function(buf: DataView, off: number, field: number): any {
 		field = field|0;
-		buf[off+0] = (field) >> 0;
-		buf[off+1] = (field) >> 8;
-		buf[off+2] = (field) >> 16;
-		buf[off+3] = (field) >> 24;
+		buf.setInt32(off, field, true);
 	},
-	int64: function(buf: Uint8Array, off: number, field: number): any {
+	int64: function(buf: DataView, off: number, field: number): any {
 		let lo = field|0;
-		let hi = (field - (-1 >>> 0))|0;
-		buf[off+0] = (lo) >> 0;
-		buf[off+1] = (lo) >> 8;
-		buf[off+2] = (lo) >> 16;
-		buf[off+3] = (lo) >> 24;
-		buf[off+4] = (hi) >> 0;
-		buf[off+5] = (hi) >> 8;
-		buf[off+6] = (hi) >> 16;
-		buf[off+7] = (hi) >> 24;
+		let hi = 0;
+		if (field > lo)
+			hi = (field - (-1 >>> 0))|0;
+		buf.setInt32(off, lo, true);
+		buf.setInt32(off+4, hi, true);
 	},
 };
 
 export function Marshal(buf: Uint8Array, obj: any, def: StructDef): any {
 	if (!buf || !obj || !def)
 		return 'missing required inputs';
+
+	let view = new DataView(buf.buffer, buf.byteOffset);
 
 	const write = WRITE_FNS;
 	let off = 0;
@@ -133,9 +119,9 @@ export function Marshal(buf: Uint8Array, obj: any, def: StructDef): any {
 
 		let err: any;
 		if (field.marshal)
-			err = field.marshal(buf, off, obj[field.name]);
+			err = field.marshal(view, off, obj[field.name]);
 		else
-			err = write[field.type](buf, off, obj[field.name]);
+			err = write[field.type](view, off, obj[field.name]);
 		if (err)
 			throw new Error(err);
 

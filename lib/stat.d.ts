@@ -34,18 +34,18 @@ export declare const StatDef: {
     } | {
         name: string;
         type: string;
-        marshal: (dst: Uint8Array, off: number, src: any) => any;
+        marshal: (dst: DataView, off: number, src: any) => any;
         omit: boolean;
     } | {
         name: string;
         type: string;
         count: number;
-        marshal: (dst: Uint8Array, off: number, src: any) => any;
+        marshal: (dst: DataView, off: number, src: any) => any;
     } | {
         name: string;
         type: string;
         count: number;
-        marshal: (dst: Uint8Array, off: number, src: any) => any;
+        marshal: (dst: DataView, off: number, src: any) => any;
         omit: boolean;
     })[];
     alignment: string;

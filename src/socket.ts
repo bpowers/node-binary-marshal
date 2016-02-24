@@ -7,19 +7,22 @@
 
 import { isZero } from './marshal';
 
-export function IPv4BytesToStr(src: Uint8Array, off: number): any {
+export function IPv4BytesToStr(src: DataView, off: number): any {
 	if (!off)
 		off = 0;
-	return '' + src[off+0] + '.' + src[off+1] + '.' + src[off+2] + '.' + src[off+3];
+	return '' + src.getUint8(off+0) +
+		'.' + src.getUint8(off+1) +
+		'.' + src.getUint8(off+2) +
+		'.' + src.getUint8(off+3);
 }
 
-export function IPv4StrToBytes(dst: Uint8Array, off: number, src: string): any {
-	if (!dst || dst.length < 4)
+export function IPv4StrToBytes(dst: DataView, off: number, src: string): any {
+	if (!dst || dst.byteLength < 4)
 		return 'invalid dst';
-	dst[off+0] = 0;
-	dst[off+1] = 0;
-	dst[off+2] = 0;
-	dst[off+3] = 0;
+	dst.setUint8(off+0, 0);
+	dst.setUint8(off+1, 0);
+	dst.setUint8(off+2, 0);
+	dst.setUint8(off+3, 0);
 
 	let start = 0;
 	let n = off;
@@ -28,7 +31,7 @@ export function IPv4StrToBytes(dst: Uint8Array, off: number, src: string): any {
 			n++;
 			continue;
 		}
-		dst[n] = dst[n]*10 + parseInt(src[i], 10);
+		dst.setUint8(n, dst.getUint8(n)*10 + parseInt(src[i], 10));
 	}
 	return undefined;
 }
