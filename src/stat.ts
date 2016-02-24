@@ -30,7 +30,13 @@ export const TimevalDef = TimespecDef;
 
 function nullMarshal (dst: DataView, off: number, src: any): any {};
 function timespecMarshal (dst: DataView, off: number, src: any): any {
-	Marshal(dst, off, src, TimespecDef)
+	let timestamp = Date.parse(src);
+	let secs = Math.floor(timestamp/1000);
+	let timespec = {
+		sec: secs,
+		nsec: (timestamp - secs*1000)*1e6,
+	};
+	Marshal(dst, off, timespec, TimespecDef);
 };
 
 export interface Stat {
