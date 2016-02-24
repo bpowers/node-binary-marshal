@@ -65,7 +65,8 @@ describe('ip marshal', () => {
 	};
 	it('should marshal ' + t.addr, () => {
 		let buf = new Uint8Array(16);
-		let err = Marshal(buf, t, socket.SockAddrInDef);
+		let view = new DataView(buf.buffer, buf.byteOffset);
+		let err = Marshal(view, 0, t, socket.SockAddrInDef);
 		expect(err).to.not.be.ok;
 	});
 });

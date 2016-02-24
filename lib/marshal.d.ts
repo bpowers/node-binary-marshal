@@ -19,7 +19,7 @@ export interface UnmarshalFn {
     (src: DataView, off: number): any;
 }
 export interface EnsureFn {
-    (field: Uint8Array): boolean;
+    (field: DataView): boolean;
 }
-export declare function Marshal(buf: Uint8Array, obj: any, def: StructDef): any;
-export declare function isZero(field: Uint8Array): boolean;
+export declare function Marshal(buf: DataView, off: number, obj: any, def: StructDef): any;
+export declare function isZero(field: DataView): boolean;

@@ -5,7 +5,7 @@
 'use strict';
 
 
-import { MarshalFn, isZero } from './marshal';
+import { Marshal, MarshalFn, isZero } from './marshal';
 
 export interface Timespec {
 	sec:  number;
@@ -28,7 +28,10 @@ export interface Timeval {
 
 export const TimevalDef = TimespecDef;
 
-let nullMarshal = (dst: DataView, off: number, src: any): any => {};
+function nullMarshal (dst: DataView, off: number, src: any): any {};
+function timespecMarshal (dst: DataView, off: number, src: any): any {
+	Marshal(dst, off, src, TimespecDef)
+};
 
 export interface Stat {
 	family: number;
@@ -49,9 +52,9 @@ export const StatDef = {
 		{name: 'size',    type: 'int64'},
 		{name: 'blksize', type: 'int64'},
 		{name: 'blocks',  type: 'int64'},
-		{name: 'atime',   type: 'int64', count: 2, marshal: nullMarshal},
-		{name: 'mtime',   type: 'int64', count: 2, marshal: nullMarshal},
-		{name: 'ctime',   type: 'int64', count: 2, marshal: nullMarshal},
+		{name: 'atime',   type: 'int64', count: 2, marshal: timespecMarshal},
+		{name: 'mtime',   type: 'int64', count: 2, marshal: timespecMarshal},
+		{name: 'ctime',   type: 'int64', count: 2, marshal: timespecMarshal},
 		{name: 'X__unused', type: 'int64', count: 3, marshal: nullMarshal, omit: true},
 	],
 	alignment: 'natural', // 'packed'

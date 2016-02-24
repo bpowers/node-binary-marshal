@@ -20,7 +20,7 @@ export declare const SockAddrInDef: {
         name: string;
         type: string;
         count: number;
-        ensure: (field: Uint8Array) => boolean;
+        ensure: (field: DataView) => boolean;
         omit: boolean;
     })[];
     alignment: string;

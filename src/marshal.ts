@@ -30,7 +30,7 @@ export interface UnmarshalFn {
 }
 
 export interface EnsureFn {
-	(field: Uint8Array): boolean;
+	(field: DataView): boolean;
 }
 
 function typeLen(type: string): number {
@@ -106,22 +106,19 @@ const WRITE_FNS: {[n: string]: MarshalFn} = {
 	},
 };
 
-export function Marshal(buf: Uint8Array, obj: any, def: StructDef): any {
+export function Marshal(buf: DataView, off: number, obj: any, def: StructDef): any {
 	if (!buf || !obj || !def)
 		return 'missing required inputs';
 
-	let view = new DataView(buf.buffer, buf.byteOffset);
-
 	const write = WRITE_FNS;
-	let off = 0;
 	for (let i = 0; i < def.fields.length; i++) {
 		let field: FieldDef = def.fields[i];
 
 		let err: any;
 		if (field.marshal)
-			err = field.marshal(view, off, obj[field.name]);
+			err = field.marshal(buf, off, obj[field.name]);
 		else
-			err = write[field.type](view, off, obj[field.name]);
+			err = write[field.type](buf, off, obj[field.name]);
 		if (err)
 			throw new Error(err);
 
@@ -131,9 +128,9 @@ export function Marshal(buf: Uint8Array, obj: any, def: StructDef): any {
 }
 
 
-export function isZero(field: Uint8Array): boolean {
-	for (let i = 0; i < field.length; i++) {
-		if (field[i] !== 0)
+export function isZero(field: DataView): boolean {
+	for (let i = 0; i < field.byteLength; i++) {
+		if (field.getUint8(i) !== 0)
 			return false;
 	}
 	return true;
