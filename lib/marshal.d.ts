@@ -22,5 +22,6 @@ export interface UnmarshalFn {
 export interface EnsureFn {
     (field: DataView): boolean;
 }
-export declare function Marshal(buf: DataView, off: number, obj: any, def: StructDef): any;
+export declare function Marshal(buf: DataView, off: number, obj: any, def: StructDef): Error;
+export declare function Unmarshal(obj: any, buf: DataView, off: number, def: StructDef): Error;
 export declare function isZero(field: DataView): boolean;

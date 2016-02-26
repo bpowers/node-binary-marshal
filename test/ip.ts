@@ -1,4 +1,4 @@
-// Copyright 2015 Bobby Powers. All rights reserved.
+// Copyright 2016 Bobby Powers. All rights reserved.
 // Use of this source code is governed by the ISC
 // license that can be found in the LICENSE file.
 
@@ -8,7 +8,7 @@
 
 import * as chai from 'chai';
 import * as socket from '../lib/socket';
-import { Marshal } from '../lib/marshal';
+import { Marshal, Unmarshal } from '../lib/marshal';
 
 const expect = chai.expect;
 
@@ -73,5 +73,15 @@ describe('ip marshal', () => {
 		let view = new DataView(buf.buffer, buf.byteOffset);
 		let err = Marshal(view, 0, t, socket.SockAddrInDef);
 		expect(err).to.not.be.ok;
+	});
+	it('should unmarshal ' + t.addr, () => {
+		let buf = new Uint8Array(16);
+		let view = new DataView(buf.buffer, buf.byteOffset);
+		let err = Marshal(view, 0, t, socket.SockAddrInDef);
+
+		let out: SockAddrIn = {};
+		err = Unmarshal(out, view, 0, socket.SockAddrInDef)
+		expect(err).to.not.be.ok;
+		expect(out).to.deep.equal(t);
 	});
 });

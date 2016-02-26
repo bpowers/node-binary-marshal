@@ -115,22 +115,98 @@ const WRITE_FNS: {[n: string]: MarshalFn} = {
 	},
 };
 
-export function Marshal(buf: DataView, off: number, obj: any, def: StructDef): any {
+const READ_FNS: {[n: string]: UnmarshalFn} = {
+	uint8: function(buf: DataView, off: number): [number, number, Error] {
+		let field = buf.getUint8(off) >>> 0;
+		return [field, 1, null];
+	},
+	uint16: function(buf: DataView, off: number): [number, number, Error] {
+		let field = buf.getUint16(off, true) >>> 0;
+		return [field, 2, null];
+	},
+	uint32: function(buf: DataView, off: number): [number, number, Error] {
+		let field = buf.getUint32(off, true) >>> 0;
+		return [field, 4, null];
+	},
+	uint64: function(buf: DataView, off: number): [number, number, Error] {
+
+		let lo = buf.getUint32(off, true) >>> 0;
+		let hi = buf.getUint32(off+4, true) >>> 0;
+		let field: number = lo;
+		if (hi)
+			field += hi * Math.pow(2, 32);
+		return [field, 8, null];
+	},
+	int8: function(buf: DataView, off: number): [number, number, Error] {
+		let field = buf.getInt8(off)|0;
+		return [field, 1, null];
+	},
+	int16: function(buf: DataView, off: number): [number, number, Error] {
+		let field = buf.getInt16(off, true)|0;
+		return [field, 2, null];
+	},
+	int32: function(buf: DataView, off: number): [number, number, Error] {
+		let field = buf.getInt32(off, true)|0;
+		return [field, 4, null];
+	},
+	int64: function(buf: DataView, off: number): [number, number, Error] {
+		let lo = buf.getInt32(off, true)|0;
+		let hi = buf.getInt32(off+4, true)|0;
+		let field: number = lo;
+		if (hi)
+			field += hi * Math.pow(2, 32);
+		return [field, 8, null];
+	},
+};
+
+// object is defined as 'any', as we're using index notation to read
+// the fields defined in `def` from `obj`.  I don't know of a
+// type-safe way to do this.  Suggestions welcome.
+export function Marshal(buf: DataView, off: number, obj: any, def: StructDef): Error {
 	if (!buf || !obj || !def)
-		return 'missing required inputs';
+		return new Error('missing required inputs');
 
 	const write = WRITE_FNS;
 	for (let i = 0; i < def.fields.length; i++) {
 		let field: FieldDef = def.fields[i];
 
+		let val = obj[field.name];
 		let len: number;
 		let err: Error;
 		if (field.marshal)
-			[len, err] = field.marshal(buf, off, obj[field.name]);
+                        [len, err] = field.marshal(buf, off, val);
 		else
-			[len, err] = write[field.type](buf, off, obj[field.name]);
+			[len, err] = write[field.type](buf, off, val);
 		if (err)
-			throw err;
+			return err;
+
+		if (len === undefined)
+			len = fieldLen(field);
+		off += len;
+	}
+}
+
+export function Unmarshal(obj: any, buf: DataView, off: number, def: StructDef): Error {
+	if (!buf || !def)
+		return new Error('missing required inputs');
+
+	const read = READ_FNS;
+	for (let i = 0; i < def.fields.length; i++) {
+		let field: FieldDef = def.fields[i];
+
+		let val: any;
+		let len: number;
+		let err: Error;
+
+		if (field.unmarshal)
+			[val, len, err] = field.unmarshal(buf, off);
+		else
+			[val, len, err] = read[field.type](buf, off);
+		if (err)
+			return err;
+
+		if (!field.omit)
+			obj[field.name] = val;
 
 		if (len === undefined)
 			len = fieldLen(field);
