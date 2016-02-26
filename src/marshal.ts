@@ -8,6 +8,7 @@
 export interface StructDef {
 	fields:    FieldDef[];
 	alignment: string;
+	length?:   number;
 }
 
 export interface FieldDef {
@@ -22,11 +23,11 @@ export interface FieldDef {
 }
 
 export interface MarshalFn {
-	(dst: DataView, off: number, src: any): any;
+	(dst: DataView, off: number, src: any): [number, Error];
 }
 
 export interface UnmarshalFn {
-	(src: DataView, off: number): any;
+	(src: DataView, off: number): [any, number, Error];
 }
 
 export interface EnsureFn {
@@ -64,45 +65,53 @@ function fieldLen(field: FieldDef): number {
 }
 
 const WRITE_FNS: {[n: string]: MarshalFn} = {
-	uint8: function(buf: DataView, off: number, field: number): any {
+	uint8: function(buf: DataView, off: number, field: number): [number, Error] {
 		field = field >>> 0;
 		buf.setUint8(off, field);
+		return [1, null];
 	},
-	uint16: function(buf: DataView, off: number, field: number): any {
+	uint16: function(buf: DataView, off: number, field: number): [number, Error] {
 		field = field >>> 0;
 		buf.setUint16(off, field, true);
+		return [2, null];
 	},
-	uint32: function(buf: DataView, off: number, field: number): any {
+	uint32: function(buf: DataView, off: number, field: number): [number, Error] {
 		field = field >>> 0;
 		buf.setUint32(off, field, true);
+		return [4, null];
 	},
-	uint64: function(buf: DataView, off: number, field: number): any {
+	uint64: function(buf: DataView, off: number, field: number): [number, Error] {
 		let lo = field >>> 0;
 		let hi = 0;
 		if (field > lo)
 			hi = (field - (-1 >>> 0)) >>> 0;
 		buf.setUint32(off, lo, true);
 		buf.setUint32(off+4, hi, true);
+		return [8, null];
 	},
-	int8: function(buf: DataView, off: number, field: number): any {
+	int8: function(buf: DataView, off: number, field: number): [number, Error] {
 		field = field|0;
 		buf.setInt8(off, field);
+		return [1, null];
 	},
-	int16: function(buf: DataView, off: number, field: number): any {
+	int16: function(buf: DataView, off: number, field: number): [number, Error] {
 		field = field|0;
 		buf.setInt16(off, field, true);
+		return [2, null];
 	},
-	int32: function(buf: DataView, off: number, field: number): any {
+	int32: function(buf: DataView, off: number, field: number): [number, Error] {
 		field = field|0;
 		buf.setInt32(off, field, true);
+		return [4, null];
 	},
-	int64: function(buf: DataView, off: number, field: number): any {
+	int64: function(buf: DataView, off: number, field: number): [number, Error] {
 		let lo = field|0;
 		let hi = 0;
 		if (field > lo)
 			hi = (field - (-1 >>> 0))|0;
 		buf.setInt32(off, lo, true);
 		buf.setInt32(off+4, hi, true);
+		return [8, null];
 	},
 };
 
@@ -114,15 +123,17 @@ export function Marshal(buf: DataView, off: number, obj: any, def: StructDef): a
 	for (let i = 0; i < def.fields.length; i++) {
 		let field: FieldDef = def.fields[i];
 
-		let err: any;
+		let len: number;
+		let err: Error;
 		if (field.marshal)
-			err = field.marshal(buf, off, obj[field.name]);
+			[len, err] = field.marshal(buf, off, obj[field.name]);
 		else
-			err = write[field.type](buf, off, obj[field.name]);
+			[len, err] = write[field.type](buf, off, obj[field.name]);
 		if (err)
-			throw new Error(err);
+			throw err;
 
-		let len = fieldLen(field);
+		if (len === undefined)
+			len = fieldLen(field);
 		off += len;
 	}
 }

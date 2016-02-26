@@ -1,6 +1,7 @@
 export interface StructDef {
     fields: FieldDef[];
     alignment: string;
+    length?: number;
 }
 export interface FieldDef {
     name: string;
@@ -13,10 +14,10 @@ export interface FieldDef {
     omit?: boolean;
 }
 export interface MarshalFn {
-    (dst: DataView, off: number, src: any): any;
+    (dst: DataView, off: number, src: any): [number, Error];
 }
 export interface UnmarshalFn {
-    (src: DataView, off: number): any;
+    (src: DataView, off: number): [any, number, Error];
 }
 export interface EnsureFn {
     (field: DataView): boolean;

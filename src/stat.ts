@@ -5,14 +5,14 @@
 'use strict';
 
 
-import { Marshal, MarshalFn, isZero } from './marshal';
+import { StructDef, Marshal, MarshalFn, isZero } from './marshal';
 
 export interface Timespec {
 	sec:  number;
 	nsec: number;
 }
 
-export const TimespecDef = {
+export const TimespecDef: StructDef = {
 	fields: [
 		{name: 'sec',  type: 'int64'},
 		{name: 'nsec', type: 'int64'},
@@ -45,7 +45,7 @@ export interface Stat {
 	addr:   string;
 }
 
-export const StatDef = {
+export const StatDef: StructDef = {
 	fields: [
 		{name: 'dev',     type: 'uint64'},
 		{name: 'ino',     type: 'uint64'},

@@ -5,20 +5,24 @@
 'use strict';
 
 
-import { isZero } from './marshal';
+import { StructDef, isZero } from './marshal';
 
-export function IPv4BytesToStr(src: DataView, off: number): any {
+export function IPv4BytesToStr(src: DataView, off: number): [any, number, Error] {
 	if (!off)
 		off = 0;
-	return '' + src.getUint8(off+0) +
-		'.' + src.getUint8(off+1) +
-		'.' + src.getUint8(off+2) +
-		'.' + src.getUint8(off+3);
+	return [
+		'' + src.getUint8(off+0) +
+			'.' + src.getUint8(off+1) +
+			'.' + src.getUint8(off+2) +
+			'.' + src.getUint8(off+3),
+		4,
+		null
+	];
 }
 
-export function IPv4StrToBytes(dst: DataView, off: number, src: string): any {
+export function IPv4StrToBytes(dst: DataView, off: number, src: string): [number, Error] {
 	if (!dst || dst.byteLength < 4)
-		return 'invalid dst';
+		return [undefined, new Error('invalid dst')];
 	dst.setUint8(off+0, 0);
 	dst.setUint8(off+1, 0);
 	dst.setUint8(off+2, 0);
@@ -33,7 +37,7 @@ export function IPv4StrToBytes(dst: DataView, off: number, src: string): any {
 		}
 		dst.setUint8(n, dst.getUint8(n)*10 + parseInt(src[i], 10));
 	}
-	return undefined;
+	return [4, null];
 }
 
 export interface SockAddrIn {
@@ -42,7 +46,7 @@ export interface SockAddrIn {
 	addr:   string;
 }
 
-export const SockAddrInDef = {
+export const SockAddrInDef: StructDef = {
 	fields: [
 		{name: 'family', type: 'uint16'},
 		{name: 'port',   type: 'uint16'},

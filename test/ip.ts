@@ -34,13 +34,17 @@ describe('ipv4 roundtrip', () => {
 		it('should roundtrip ' + t.addr, () => {
 			let buf = new Uint8Array(4);
 			let view = new DataView(buf.buffer, buf.byteOffset);
-			let err = socket.IPv4StrToBytes(view, 0, t.addr);
+			let [len, err] = socket.IPv4StrToBytes(view, 0, t.addr);
+			expect(len).to.equal(4);
 			expect(err).to.not.be.ok;
 			if (t.binary) {
 				// TODO: test
 			}
-			let out = socket.IPv4BytesToStr(view, 0);
+			let out: string;
+			[out, len, err] = socket.IPv4BytesToStr(view, 0);
 			expect(out).to.equal(t.addr);
+			expect(len).to.equal(4);
+			expect(err).to.not.be.ok;
 		});
 	});
 });
@@ -50,7 +54,8 @@ describe('ipv4 error', () => {
 		it('should error ' + t.addr, () => {
 			let buf = new Uint8Array(4);
 			let view = new DataView(buf.buffer, buf.byteOffset);
-			let err = socket.IPv4StrToBytes(view, 0, t.addr);
+			let [len, err] = socket.IPv4StrToBytes(view, 0, t.addr);
+			expect(len).to.equal(4);
 			expect(err).to.be.ok;
 		});
 	});
