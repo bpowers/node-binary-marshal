@@ -162,9 +162,11 @@ const READ_FNS: {[n: string]: UnmarshalFn} = {
 // object is defined as 'any', as we're using index notation to read
 // the fields defined in `def` from `obj`.  I don't know of a
 // type-safe way to do this.  Suggestions welcome.
-export function Marshal(buf: DataView, off: number, obj: any, def: StructDef): Error {
+export function Marshal(buf: DataView, off: number, obj: any, def: StructDef): [number, Error] {
 	if (!buf || !obj || !def)
-		return new Error('missing required inputs');
+		return [0, new Error('missing required inputs')];
+
+	let start = off;
 
 	const write = WRITE_FNS;
 	for (let i = 0; i < def.fields.length; i++) {
@@ -178,17 +180,21 @@ export function Marshal(buf: DataView, off: number, obj: any, def: StructDef): E
 		else
 			[len, err] = write[field.type](buf, off, val);
 		if (err)
-			return err;
+			return [off - start, err];
 
 		if (len === undefined)
 			len = fieldLen(field);
 		off += len;
 	}
+
+	return [off - start, null];
 }
 
-export function Unmarshal(obj: any, buf: DataView, off: number, def: StructDef): Error {
+export function Unmarshal(obj: any, buf: DataView, off: number, def: StructDef): [number, Error] {
 	if (!buf || !def)
-		return new Error('missing required inputs');
+		return [0, new Error('missing required inputs')];
+
+	let start = off;
 
 	const read = READ_FNS;
 	for (let i = 0; i < def.fields.length; i++) {
@@ -203,7 +209,7 @@ export function Unmarshal(obj: any, buf: DataView, off: number, def: StructDef):
 		else
 			[val, len, err] = read[field.type](buf, off);
 		if (err)
-			return err;
+			return [off - start, err];
 
 		if (!field.omit)
 			obj[field.name] = val;
@@ -212,6 +218,8 @@ export function Unmarshal(obj: any, buf: DataView, off: number, def: StructDef):
 			len = fieldLen(field);
 		off += len;
 	}
+
+	return [off - start, null];
 }
 
 

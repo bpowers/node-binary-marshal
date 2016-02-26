@@ -69,18 +69,18 @@ describe('ip marshal', () => {
 		addr: '127.0.0.1',
 	};
 	it('should marshal ' + t.addr, () => {
-		let buf = new Uint8Array(16);
+		let buf = new Uint8Array(socket.SockAddrInDef.length);
 		let view = new DataView(buf.buffer, buf.byteOffset);
-		let err = Marshal(view, 0, t, socket.SockAddrInDef);
+		let [len, err] = Marshal(view, 0, t, socket.SockAddrInDef);
 		expect(err).to.not.be.ok;
 	});
 	it('should unmarshal ' + t.addr, () => {
-		let buf = new Uint8Array(16);
+		let buf = new Uint8Array(socket.SockAddrInDef.length);
 		let view = new DataView(buf.buffer, buf.byteOffset);
-		let err = Marshal(view, 0, t, socket.SockAddrInDef);
+		let [len, err] = Marshal(view, 0, t, socket.SockAddrInDef);
 
-		let out: SockAddrIn = {};
-		err = Unmarshal(out, view, 0, socket.SockAddrInDef)
+		let out: any = {};
+		[len, err] = Unmarshal(out, view, 0, socket.SockAddrInDef)
 		expect(err).to.not.be.ok;
 		expect(out).to.deep.equal(t);
 	});

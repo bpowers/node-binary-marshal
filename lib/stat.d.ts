@@ -10,8 +10,18 @@ export interface Timeval {
 }
 export declare const TimevalDef: StructDef;
 export interface Stat {
-    family: number;
-    port: number;
-    addr: string;
+    dev: number;
+    ino: number;
+    nlink: number;
+    mode: number;
+    uid: number;
+    gid: number;
+    rdev: number;
+    size: number;
+    blksize: number;
+    blocks: number;
+    atime: string;
+    mtime: string;
+    ctime: string;
 }
 export declare const StatDef: StructDef;
