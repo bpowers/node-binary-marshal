@@ -82,9 +82,7 @@ const WRITE_FNS: {[n: string]: MarshalFn} = {
 	},
 	uint64: function(buf: DataView, off: number, field: number): [number, Error] {
 		let lo = field >>> 0;
-		let hi = 0;
-		if (field > lo)
-			hi = (field - (-1 >>> 0)) >>> 0;
+		let hi = (field/((-1 >>> 0)+1)) >>> 0;
 		buf.setUint32(off, lo, true);
 		buf.setUint32(off+4, hi, true);
 		return [8, null];
@@ -106,9 +104,7 @@ const WRITE_FNS: {[n: string]: MarshalFn} = {
 	},
 	int64: function(buf: DataView, off: number, field: number): [number, Error] {
 		let lo = field|0;
-		let hi = 0;
-		if (field > lo)
-			hi = (field - (-1 >>> 0))|0;
+		let hi = (field/((-1 >>> 0)+1))|0;
 		buf.setInt32(off, lo, true);
 		buf.setInt32(off+4, hi, true);
 		return [8, null];
@@ -130,12 +126,11 @@ const READ_FNS: {[n: string]: UnmarshalFn} = {
 	},
 	uint64: function(buf: DataView, off: number): [number, number, Error] {
 
-		let lo = buf.getUint32(off, true) >>> 0;
-		let hi = buf.getUint32(off+4, true) >>> 0;
-		let field: number = lo;
-		if (hi)
-			field += hi * Math.pow(2, 32);
-		return [field, 8, null];
+		let lo = buf.getUint32(off, true);
+		let hi = buf.getUint32(off+4, true);
+		if (hi !== 0)
+			hi *= ((-1 >>> 0)+1);
+		return [lo + hi, 8, null];
 	},
 	int8: function(buf: DataView, off: number): [number, number, Error] {
 		let field = buf.getInt8(off)|0;
@@ -150,12 +145,11 @@ const READ_FNS: {[n: string]: UnmarshalFn} = {
 		return [field, 4, null];
 	},
 	int64: function(buf: DataView, off: number): [number, number, Error] {
-		let lo = buf.getInt32(off, true)|0;
-		let hi = buf.getInt32(off+4, true)|0;
-		let field: number = lo;
-		if (hi)
-			field += hi * Math.pow(2, 32);
-		return [field, 8, null];
+		let lo = buf.getInt32(off, true);
+		let hi = buf.getInt32(off+4, true);
+		if (hi !== 0)
+			hi *= ((-1 >>> 0)+1);
+		return [lo + hi, 8, null];
 	},
 };
 
