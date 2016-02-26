@@ -6,9 +6,9 @@
 
 import * as _m from './marshal';
 import * as _so from './socket';
-import * as _st from './stat';
+import * as _fs from './fs';
 
 export var Marshal = _m.Marshal;
-//export var Unmarshal = m.Unmarshal;
+export var Unmarshal = _m.Unmarshal;
 export var socket = _so;
-export var stat = _st;
+export var fs = _fs;

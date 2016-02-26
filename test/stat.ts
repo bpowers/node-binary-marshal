@@ -7,7 +7,7 @@
 'use strict';
 
 import * as chai from 'chai';
-import * as stat from '../lib/stat';
+import * as fs from '../lib/fs';
 import { Marshal, Unmarshal } from '../lib/marshal';
 
 const expect = chai.expect;
@@ -17,7 +17,7 @@ interface RoundtripData {
 	binary?: number[];
 }
 
-const STAT_RT_TESTS: stat.Stat[] = [
+const STAT_RT_TESTS: fs.Stat[] = [
 	{
 		"dev":     65024,
 		"mode":    33188,
@@ -51,15 +51,15 @@ const STAT_RT_TESTS: stat.Stat[] = [
 ];
 
 describe('stat roundtrip', () => {
-	STAT_RT_TESTS.forEach((t: stat.Stat) => {
+	STAT_RT_TESTS.forEach((t: fs.Stat) => {
 		it('should roundtrip stat for ino ' + t.ino, () => {
-			let buf = new Uint8Array(stat.StatDef.length);
+			let buf = new Uint8Array(fs.StatDef.length);
 			let view = new DataView(buf.buffer, buf.byteOffset);
-			let [len, err] = Marshal(view, 0, t, stat.StatDef);
+			let [len, err] = Marshal(view, 0, t, fs.StatDef);
 			expect(err).to.not.be.ok;
 
 			let out: any = {};
-			[len, err] = Unmarshal(out, view, 0, stat.StatDef)
+			[len, err] = Unmarshal(out, view, 0, fs.StatDef)
 			expect(err).to.not.be.ok;
 			expect(out).to.deep.equal(t);
 		});
