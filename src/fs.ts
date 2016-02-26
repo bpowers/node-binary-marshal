@@ -6,6 +6,7 @@
 
 
 import { StructDef, Marshal, Unmarshal, isZero } from './marshal';
+import * as utf8 from './utf8';
 
 export interface Timespec {
 	sec:  number;
@@ -91,4 +92,87 @@ export const StatDef: StructDef = {
 	],
 	alignment: 'natural', // 'packed'
 	length: 144,
+};
+
+// corresponds to the DT_* constants
+export enum DT {
+	UNKNOWN = 0,
+	FIFO    = 1,
+	CHR     = 2,
+	DIR     = 4,
+	BLK     = 6,
+	REG     = 8,
+	LNK     = 10,
+	SOCK    = 12,
+	WHT     = 14,
+};
+
+export interface Dirent {
+	ino:    number;
+	off:    number;
+	reclen: number;
+	type:   DT;
+	name:   string;
+}
+
+/*
+  This function matches the following pattern:
+	0: 5
+	1: 4
+	2: 3
+	3: 2
+	4: 1
+	5: 8
+	6: 7
+	7: 6
+	8: 5
+	9: 4
+
+  Which is what we want for the size of trailing whitespace in
+  dirents -- which needs to end up padding the structure to be
+  8-byte aligned, and needs at least 1 trailing null so that the
+  bytes can be seen as a null-terminated C string.
+*/
+function nzeros(nBytes: number): number {
+	return (8 - ((nBytes+3) % 8))
+}
+
+function cstringMarshal (dst: DataView, off: number, src: any): [number, Error] {
+	if (typeof src !== 'string')
+		return [undefined, new Error('src not a string: ' + src)];
+
+	let bytes = utf8.utf8ToBytes(src);
+	let nZeros = nzeros(bytes.length);
+
+	if (off + bytes.length + nZeros > dst.byteLength)
+		return [undefined, new Error('dst not big enough')];
+
+	for (let i = 0; i < bytes.length; i++)
+		dst.setUint8(off+i, bytes[i]);
+
+	for (let i = 0; i < nZeros; i++)
+		dst.setUint8(off+bytes.length+i, 0);
+
+	return [bytes + nZeros, null];
+};
+
+function cstringUnmarshal (src: DataView, off: number): [any, number, Error] {
+	let len = 0;
+	for (let i = off; i < src.byteLength && src.getUint8(i) !== 0; i++)
+		len++;
+
+	let str = utf8.utf8Slice(src, off, off+len);
+
+	return [str, undefined, null];
+};
+
+export const DirentDef: StructDef = {
+	fields: [
+		{name: 'ino',    type: 'uint64'},
+		{name: 'off',    type: 'int64'},
+		{name: 'reclen', type: 'uint16'},
+		{name: 'type',   type: 'uint8'},
+		{name: 'name',   type: 'string', marshal: cstringMarshal, unmarshal: cstringUnmarshal},
+	],
+	alignment: 'natural', // 'packed'
 };

@@ -12,11 +12,6 @@ import { Marshal, Unmarshal } from '../lib/marshal';
 
 const expect = chai.expect;
 
-interface RoundtripData {
-	addr: string;
-	binary?: number[];
-}
-
 const STAT_RT_TESTS: fs.Stat[] = [
 	{
 		"dev":     65024,

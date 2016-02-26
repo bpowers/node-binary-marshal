@@ -25,3 +25,22 @@ export interface Stat {
     ctime: string;
 }
 export declare const StatDef: StructDef;
+export declare enum DT {
+    UNKNOWN = 0,
+    FIFO = 1,
+    CHR = 2,
+    DIR = 4,
+    BLK = 6,
+    REG = 8,
+    LNK = 10,
+    SOCK = 12,
+    WHT = 14,
+}
+export interface Dirent {
+    ino: number;
+    off: number;
+    reclen: number;
+    type: DT;
+    name: string;
+}
+export declare const DirentDef: StructDef;
