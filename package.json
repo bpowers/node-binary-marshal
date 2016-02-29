@@ -1,6 +1,6 @@
 {
   "name": "node-binary-marshal",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Roundtrip JSON objects to C structs in Uint8Arrays",
   "main": "lib/main.js",
   "typings": "lib/main",
