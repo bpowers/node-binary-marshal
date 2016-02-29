@@ -125,7 +125,7 @@ export class Dirent {
 	get reclen(): number {
 		let slen = utf8.utf8ToBytes(this.name).length;
 		let nZeros = nzeros(slen);
-		return slen + nZeros;
+		return slen + nZeros + 1 + 2 + 8 + 8;
 	}
 }
 
@@ -167,7 +167,7 @@ function nameMarshal(dst: DataView, off: number, src: any): [number, Error] {
 	for (let i = 0; i < nZeros; i++)
 		dst.setUint8(off+bytes.length+i, 0);
 
-	return [bytes + nZeros, null];
+	return [bytes.length + nZeros, null];
 };
 
 function nameUnmarshal(src: DataView, off: number): [any, number, Error] {

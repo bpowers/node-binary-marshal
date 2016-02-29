@@ -27,15 +27,21 @@ const DIRENT_RT_TESTS: fs.Dirent[] = [
 		"type":     fs.DT.REG,
 		"name":     "中文",
 	},
+	new fs.Dirent(65025, fs.DT.REG, "中文"),
 ];
 
 describe('dir roundtrip', () => {
 	DIRENT_RT_TESTS.forEach((t: fs.Dirent) => {
 		it('should roundtrip dirent for ino ' + t.ino, () => {
+			expect(t.reclen%8).to.equal(0);
+
 			let buf = new Uint8Array(1024);
 			let view = new DataView(buf.buffer, buf.byteOffset);
 			let [len, err] = Marshal(view, 0, t, fs.DirentDef);
+
 			expect(err).to.not.be.ok;
+			expect(len).to.be.above(0);
+			expect(len%8).to.equal(0);
 
 			let out: any = {};
 			[len, err] = Unmarshal(out, view, 0, fs.DirentDef)
