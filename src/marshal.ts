@@ -54,6 +54,7 @@ function typeLen(type: string): number {
 		return 8;
 	default:
 		console.log('unknown type');
+		console.log(type)
 		debugger;
 		return undefined;
 	}

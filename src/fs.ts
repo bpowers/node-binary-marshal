@@ -107,12 +107,26 @@ export enum DT {
 	WHT     = 14,
 };
 
-export interface Dirent {
+export class Dirent {
 	ino:    number;
-	off:    number;
-	reclen: number;
 	type:   DT;
 	name:   string;
+
+	constructor(ino: number, type: DT, name: string) {
+		this.ino = ino;
+		this.type = type;
+		this.name = name;
+	}
+
+	get off(): number {
+		return 0;
+	}
+
+	get reclen(): number {
+		let slen = utf8.utf8ToBytes(this.name).length;
+		let nZeros = nzeros(slen);
+		return slen + nZeros;
+	}
 }
 
 /*
@@ -137,7 +151,7 @@ function nzeros(nBytes: number): number {
 	return (8 - ((nBytes+3) % 8))
 }
 
-function cstringMarshal (dst: DataView, off: number, src: any): [number, Error] {
+function nameMarshal(dst: DataView, off: number, src: any): [number, Error] {
 	if (typeof src !== 'string')
 		return [undefined, new Error('src not a string: ' + src)];
 
@@ -156,14 +170,15 @@ function cstringMarshal (dst: DataView, off: number, src: any): [number, Error] 
 	return [bytes + nZeros, null];
 };
 
-function cstringUnmarshal (src: DataView, off: number): [any, number, Error] {
+function nameUnmarshal(src: DataView, off: number): [any, number, Error] {
 	let len = 0;
 	for (let i = off; i < src.byteLength && src.getUint8(i) !== 0; i++)
 		len++;
 
 	let str = utf8.utf8Slice(src, off, off+len);
+	let nZeros = nzeros(len);
 
-	return [str, undefined, null];
+	return [str, len + nZeros, null];
 };
 
 export const DirentDef: StructDef = {
@@ -172,7 +187,7 @@ export const DirentDef: StructDef = {
 		{name: 'off',    type: 'int64'},
 		{name: 'reclen', type: 'uint16'},
 		{name: 'type',   type: 'uint8'},
-		{name: 'name',   type: 'string', marshal: cstringMarshal, unmarshal: cstringUnmarshal},
+		{name: 'name',   type: 'string', marshal: nameMarshal, unmarshal: nameUnmarshal},
 	],
 	alignment: 'natural', // 'packed'
 };

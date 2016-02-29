@@ -36,11 +36,12 @@ export declare enum DT {
     SOCK = 12,
     WHT = 14,
 }
-export interface Dirent {
+export declare class Dirent {
     ino: number;
-    off: number;
-    reclen: number;
     type: DT;
     name: string;
+    constructor(ino: number, type: DT, name: string);
+    off: number;
+    reclen: number;
 }
 export declare const DirentDef: StructDef;
