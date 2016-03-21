@@ -1,21 +1,25 @@
 {
   "name": "node-binary-marshal",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Roundtrip JSON objects to C structs in Uint8Arrays",
   "main": "lib/main.js",
   "typings": "lib/main",
-  "scripts": {},
+  "scripts": {
+    "prepublish": "node_modules/.bin/gulp lib",
+    "test": "node_modules/.bin/gulp test"
+  },
   "author": "Bobby Powers <bobbypowers@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
     "gulp-mocha": "^2.2.0",
-    "gulp-tslint": "^3.6.0",
-    "gulp-typescript": "^2.12.0",
+    "gulp-tslint": "^4.3.3",
+    "gulp-typescript": "^2.12.1",
     "merge2": "^0.3.7",
     "mocha": "^2.4.5",
     "tsd": "^0.6.5",
-    "typescript": "^1.8.2"
+    "tslint": "^3.6.0",
+    "typescript": "^1.8.9"
   }
 }
