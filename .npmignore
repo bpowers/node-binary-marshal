@@ -1,3 +1,10 @@
 /node_modules
 *~
-/test/*.js
+/test
+/typings
+/Makefile
+/gulpfile.js
+/tsd.json
+/.npmignore
+/tsconfig.json
+/tslint.json
