@@ -4,6 +4,7 @@
         "module": "commonjs",
         "noImplicitAny": true,
         "removeComments": true,
+        "sortOutput": true,
         "newLine": "LF"
     }
 }
