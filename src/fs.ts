@@ -38,7 +38,7 @@ function nullUnmarshal (src: DataView, off: number): [any, number, Error] {
 };
 
 function timespecMarshal (dst: DataView, off: number, src: any): [number, Error] {
-	let timestamp = Date.parse(src);
+	let timestamp = src.getTime();
 	let secs = Math.floor(timestamp/1000);
 	let timespec = {
 		sec: secs,
@@ -52,8 +52,7 @@ function timespecUnmarshal (src: DataView, off: number): [any, number, Error] {
 	let [len, err] = Unmarshal(timespec, src, off, TimespecDef);
 	let sec = timespec.sec;
 	let nsec = timespec.nsec;
-	let timestr = new Date(sec*1e3 + nsec/1e6).toISOString();
-	return [timestr, len, err];
+	return [new Date(sec*1e3 + nsec/1e6), len, err];
 };
 
 export interface Stat {
@@ -67,9 +66,9 @@ export interface Stat {
 	size:    number;
 	blksize: number;
 	blocks:  number;
-	atime:   string;
-	mtime:   string;
-	ctime:   string;
+	atime:   Date;
+	mtime:   Date;
+	ctime:   Date;
 }
 
 export const StatDef: StructDef = {

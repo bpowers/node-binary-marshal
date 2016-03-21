@@ -20,9 +20,9 @@ export interface Stat {
     size: number;
     blksize: number;
     blocks: number;
-    atime: string;
-    mtime: string;
-    ctime: string;
+    atime: Date;
+    mtime: Date;
+    ctime: Date;
 }
 export declare const StatDef: StructDef;
 export declare enum DT {

@@ -24,9 +24,9 @@ const STAT_RT_TESTS: fs.Stat[] = [
 		"ino":     5902877,
 		"size":    526,
 		"blocks":  8,
-		"atime":   "2016-02-24T21:18:45.627Z",
-		"mtime":   "2016-02-26T15:03:46.492Z",
-		"ctime":   "2016-02-26T15:03:46.492Z",
+		"atime":   new Date("2016-02-24T21:18:45.627Z"),
+		"mtime":   new Date("2016-02-26T15:03:46.492Z"),
+		"ctime":   new Date("2016-02-26T15:03:46.492Z"),
 	},
 	{ // version with some numbers > 2^32
 		"dev":     65024,
@@ -39,9 +39,9 @@ const STAT_RT_TESTS: fs.Stat[] = [
 		"ino":     Math.pow(2, 41) + 5,
 		"size":    -(Math.pow(2, 40) + 3),
 		"blocks":  8,
-		"atime":   "2016-02-24T21:18:45.627Z",
-		"mtime":   "2016-02-26T15:03:46.492Z",
-		"ctime":   "2016-02-26T15:03:46.492Z",
+		"atime":   new Date("2016-02-24T21:18:45.627Z"),
+		"mtime":   new Date("2016-02-26T15:03:46.492Z"),
+		"ctime":   new Date("2016-02-26T15:03:46.492Z"),
 	},
 ];
 
