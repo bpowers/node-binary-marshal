@@ -54,7 +54,7 @@ describe('stat roundtrip', () => {
 			expect(err).to.not.be.ok;
 
 			let out: any = {};
-			[len, err] = Unmarshal(out, view, 0, fs.StatDef)
+			[len, err] = Unmarshal(out, view, 0, fs.StatDef);
 			expect(err).to.not.be.ok;
 			expect(out).to.deep.equal(t);
 		});

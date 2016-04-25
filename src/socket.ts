@@ -40,6 +40,25 @@ export function IPv4StrToBytes(dst: DataView, off: number, src: string): [number
 	return [4, null];
 }
 
+export function htons(dst: DataView, off: number, src: number): [number, Error] {
+	if (!dst || dst.byteLength < 4)
+		return [undefined, new Error('invalid dst')];
+	dst.setUint8(off+0, (src >> 8) & 0xff);
+	dst.setUint8(off+1, src & 0xff);
+
+	return [2, null];
+}
+
+export function ntohs(src: DataView, off: number): [any, number, Error] {
+	if (!off)
+		off = 0;
+	return [
+		src.getUint8(off+1) + (src.getUint8(off) << 8),
+		2,
+		null
+	];
+}
+
 export interface SockAddrIn {
 	family: number;
 	port:   number;
@@ -49,7 +68,12 @@ export interface SockAddrIn {
 export const SockAddrInDef: StructDef = {
 	fields: [
 		{name: 'family', type: 'uint16'},
-		{name: 'port',   type: 'uint16'},
+		{
+			name:     'port',
+			type:     'uint16',
+			marshal:   htons,
+			unmarshal: ntohs,
+		},
 		{
 			name:      'addr',
 			type:      'uint8',

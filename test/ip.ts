@@ -65,7 +65,7 @@ describe('ipv4 error', () => {
 describe('ip marshal', () => {
 	let t  = {
 		family: 1,
-		port: 2,
+		port: 6379,
 		addr: '127.0.0.1',
 	};
 	it('should marshal ' + t.addr, () => {
